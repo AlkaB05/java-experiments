@@ -1,0 +1,130 @@
+import java.util.*;
+import java.util.stream.*;
+import java.util.function.*;
+
+class Employee {
+    String name;
+    int age;
+    double salary;
+
+    Employee(String name, int age, double salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return name + " | " + age + " | " + salary;
+    }
+}
+
+class Student {
+    String name;
+    double marks;
+
+    Student(String name, double marks) {
+        this.name = name;
+        this.marks = marks;
+    }
+
+    @Override
+    public String toString() {
+        return name + " | " + marks;
+    }
+}
+
+class Product {
+    String name;
+    double price;
+    String category;
+
+    Product(String name, double price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
+    @Override
+    public String toString() {
+        return name + " | " + price + " | " + category;
+    }
+}
+
+public class LambdaStreamDemo {
+
+    public static void main(String[] args) {
+
+        // ================= Part a: Employee Sorting =================
+        List<Employee> employees = Arrays.asList(
+            new Employee("Alice", 30, 50000),
+            new Employee("Bob", 25, 60000),
+            new Employee("Charlie", 35, 55000)
+        );
+
+        // Sort by name (alphabetically)
+        System.out.println("Employees sorted by name:");
+        employees.sort((e1, e2) -> e1.name.compareTo(e2.name));
+        employees.forEach(System.out::println);
+
+        // Sort by age (ascending)
+        System.out.println("\nEmployees sorted by age:");
+        employees.sort(Comparator.comparingInt(e -> e.age));
+        employees.forEach(System.out::println);
+
+        // Sort by salary (descending)
+        System.out.println("\nEmployees sorted by salary (descending):");
+        employees.sort((e1, e2) -> Double.compare(e2.salary, e1.salary));
+        employees.forEach(System.out::println);
+
+        // ================= Part b: Student Filtering and Sorting =================
+        List<Student> students = Arrays.asList(
+            new Student("David", 80),
+            new Student("Eva", 70),
+            new Student("Frank", 90),
+            new Student("Grace", 85)
+        );
+
+        System.out.println("\nStudents with marks > 75 sorted by marks:");
+        students.stream()
+                .filter(s -> s.marks > 75)
+                .sorted(Comparator.comparingDouble(s -> s.marks))
+                .map(s -> s.name)
+                .forEach(System.out::println);
+
+        // ================= Part c: Product Stream Operations =================
+        List<Product> products = Arrays.asList(
+            new Product("Laptop", 80000, "Electronics"),
+            new Product("Smartphone", 40000, "Electronics"),
+            new Product("Chair", 5000, "Furniture"),
+            new Product("Table", 12000, "Furniture"),
+            new Product("Headphones", 3000, "Electronics")
+        );
+
+        // Group products by category
+        Map<String, List<Product>> groupedByCategory = products.stream()
+                .collect(Collectors.groupingBy(p -> p.category));
+
+        System.out.println("\nProducts grouped by category:");
+        groupedByCategory.forEach((category, prodList) -> {
+            System.out.println(category + ": " + prodList);
+        });
+
+        // Find most expensive product in each category
+        Map<String, Optional<Product>> maxPriceByCategory = products.stream()
+                .collect(Collectors.groupingBy(
+                    p -> p.category,
+                    Collectors.maxBy(Comparator.comparingDouble(p -> p.price))
+                ));
+
+        System.out.println("\nMost expensive product in each category:");
+        maxPriceByCategory.forEach((category, prod) -> {
+            System.out.println(category + ": " + prod.get());
+        });
+
+        // Calculate average price of all products
+        double avgPrice = products.stream()
+                .collect(Collectors.averagingDouble(p -> p.price));
+        System.out.println("\nAverage price of all products: " + avgPrice);
+    }
+}
